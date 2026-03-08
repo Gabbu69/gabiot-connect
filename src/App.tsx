@@ -395,9 +395,23 @@ export default function App() {
         @keyframes pulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
         @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .tab-btn { background:none; border:none; cursor:pointer; padding:8px 16px; font-family:'Courier New',monospace; font-size:10px; letter-spacing:2px; transition:all 0.2s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes cardAlertPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+        .tab-btn { background:none; border:none; cursor:pointer; padding:8px 16px; font-family:'Courier New',monospace; font-size:10px; letter-spacing:2px; transition:all 0.2s; outline: none; }
         .tab-btn:hover { color:#22c55e !important; }
+        .tab-btn:focus { outline: 1px solid #22c55e; outline-offset: 2px; }
         .stat-pill { background:#0a0a0f; border:1px solid #1a1a2e; border-radius:8px; padding:8px 16px; text-align:center; }
+        .tab-content { animation: fadeIn 0.3s ease-out; }
+        .loading-skeleton { background: linear-gradient(90deg, #1a1a2e 25%, #2a2a3e 50%, #1a1a2e 75%); background-size: 1000px 100%; animation: shimmer 2s infinite; }
+        @media (max-width: 768px) {
+          .tab-btn { padding: 6px 12px; font-size: 8px; }
+          .stat-pill { padding: 6px 12px; font-size: 9px; }
+          .tab-btn:focus { outline-width: 2px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          * { animation: none !important; transition: none !important; }
+        }
       `}</style>
       
       <MatrixRain />
@@ -405,31 +419,31 @@ export default function App() {
       {/* scanline */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-b from-transparent via-[#22c55e22] to-transparent animate-[scanline_8s_linear_infinite] z-[1] pointer-events-none" />
 
-      <div className="relative z-[2] max-w-[1100px] mx-auto px-4 py-5">
+      <div className="relative z-[2] max-w-[1100px] mx-auto px-3 sm:px-4 py-4 sm:py-5">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center border-b border-[#1a1a2e] pb-4 mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#1a1a2e] pb-4 mb-6">
           <div>
-            <div className="text-[#22c55e] text-xl font-bold tracking-[4px] drop-shadow-[0_0_20px_#22c55e] font-['Share_Tech_Mono']">
+            <div className="text-[#22c55e] text-lg sm:text-xl font-bold tracking-[2px] sm:tracking-[4px] drop-shadow-[0_0_20px_#22c55e] font-['Share_Tech_Mono']">
               ◈ GABIOT<span className="text-[#06b6d4]"> CONNECT</span>
             </div>
-            <div className="text-[#333] text-[9px] tracking-[3px] mt-0.5">
+            <div className="text-[#333] text-[8px] sm:text-[9px] tracking-[2px] sm:tracking-[3px] mt-0.5">
               IoT · SECURED DATA LAYER · REAL-TIME TELEMETRY
             </div>
           </div>
 
-          <div className="flex gap-5 items-center">
-            <div className="stat-pill">
-              <div className="text-[#06b6d4] text-sm font-bold">{SENSORS.length}</div>
-              <div className="text-[#333] text-[8px] tracking-[2px]">NODES</div>
+          <div className="flex gap-3 sm:gap-5 items-center w-full sm:w-auto">
+            <div className="stat-pill text-sm">
+              <div className="text-[#06b6d4] text-xs sm:text-sm font-bold">{SENSORS.length}</div>
+              <div className="text-[#333] text-[7px] sm:text-[8px] tracking-[1px] sm:tracking-[2px]">NODES</div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className={`w-2 h-2 rounded-full ${syncError ? "bg-red-500 shadow-[0_0_12px_#ef4444]" : "bg-[#22c55e] shadow-[0_0_12px_#22c55e]"} animate-[pulse_2s_infinite]`} />
-              <span className={`${syncError ? "text-red-500" : "text-[#22c55e]"} text-[9px] tracking-[2px]`}>
+              <span className={`${syncError ? "text-red-500" : "text-[#22c55e]"} text-[8px] sm:text-[9px] tracking-[1px] sm:tracking-[2px]`}>
                 {syncError ? "SYNC ERROR" : "LIVE"}
               </span>
             </div>
-            <button onClick={handleLogout} className="p-2 text-[#444] hover:text-red-500 transition-colors">
+            <button onClick={handleLogout} className="p-1.5 sm:p-2 text-[#444] hover:text-red-500 transition-colors ml-auto">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -457,12 +471,13 @@ export default function App() {
         </div>
 
         {/* TABS */}
-        <div className="flex gap-1 mb-5 border-b border-[#1a1a2e]">
+        <div className="flex gap-1 mb-5 border-b border-[#1a1a2e] overflow-x-auto pb-2">
           {["dashboard", "analytics", "alerts", "hardware", "chat"].map(tab => (
-            <button key={tab} className="tab-btn"
+            <button key={tab} className="tab-btn whitespace-nowrap"
               style={{
                 color: activeTab === tab ? "#22c55e" : "#444",
-                borderBottom: activeTab === tab ? "2px solid #22c55e" : "2px solid transparent"
+                borderBottom: activeTab === tab ? "2px solid #22c55e" : "2px solid transparent",
+                transition: "all 0.3s ease"
               }}
               onClick={() => setActiveTab(tab)}>
               {tab.toUpperCase()}
@@ -472,9 +487,11 @@ export default function App() {
 
         {activeTab === "dashboard" && (
           <>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4 mb-5">
-              {SENSORS.map(s => (
-                <GlowCard key={s.id} sensor={s} value={readings[s.id]} history={histories[s.id]} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-5 auto-rows-max">
+              {SENSORS.map((s, i) => (
+                <div key={s.id} style={{ animation: `slideIn 0.3s ease-out ${i * 0.05}s backwards` }}>
+                  <GlowCard sensor={s} value={readings[s.id]} history={histories[s.id]} />
+                </div>
               ))}
             </div>
             <TxLog logs={logs} />
@@ -482,7 +499,7 @@ export default function App() {
         )}
 
         {activeTab === "analytics" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="tab-content grid grid-cols-1 md:grid-cols-2 gap-4">
             {SENSORS.map(s => (
               <div key={s.id} className="bg-[#0a0a0f] rounded-2xl p-5 shadow-[0_0_20px_rgba(34,197,94,0.05)] border border-[#1a1a2e]">
                 <div style={{ color: s.color }} className="text-[10px] tracking-[3px] mb-3 flex items-center gap-2">
@@ -517,7 +534,7 @@ export default function App() {
         )}
 
         {activeTab === "alerts" && (
-          <div className="flex flex-col gap-2.5">
+          <div className="tab-content flex flex-col gap-2.5">
             <div className="text-[#333] text-[9px] tracking-[3px] mb-2">◈ ALERT THRESHOLD MONITOR</div>
             {SENSORS.map(s => {
               const isAlert = s.id === "DIST_01" ? readings[s.id] < s.alert : readings[s.id] > s.alert;
@@ -547,7 +564,7 @@ export default function App() {
         )}
 
         {activeTab === "hardware" && (
-          <div className="bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl p-8 shadow-[0_0_30px_rgba(34,197,94,0.05)]">
+          <div className="tab-content bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl p-8 shadow-[0_0_30px_rgba(34,197,94,0.05)]">
             <div className="flex items-center gap-3 mb-6">
               <Cpu className="w-6 h-6 text-[#22c55e]" />
               <h2 className="text-[#22c55e] text-xl font-bold tracking-widest">HARDWARE INTEGRATION PROTOCOL</h2>
@@ -567,7 +584,7 @@ export default function App() {
         )}
 
         {activeTab === "chat" && (
-          <div className="bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl flex flex-col h-[600px] overflow-hidden shadow-[0_0_30px_rgba(34,197,94,0.05)]">
+          <div className="tab-content bg-[#0a0a0f] border border-[#1a1a2e] rounded-2xl flex flex-col h-[400px] sm:h-[500px] md:h-[600px] overflow-hidden shadow-[0_0_30px_rgba(34,197,94,0.05)]">
             {/* Chat Header */}
             <div className="px-6 py-4 border-b border-[#1a1a2e] flex items-center justify-between bg-[#050508]">
               <div className="flex items-center gap-3">
@@ -636,14 +653,14 @@ export default function App() {
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleAiChat()}
-                  placeholder="ENTER COMMAND..."
+                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleAiChat()}
+                  placeholder="ENTER COMMAND... (Ctrl+Enter to send)"
                   className="w-full bg-[#0a0a0f] border border-[#1a1a2e] rounded-lg px-4 py-3 text-[#22c55e] text-xs focus:outline-none focus:border-[#22c55e] transition-all pr-12"
                 />
                 <button 
                   onClick={() => handleAiChat()}
-                  disabled={isAiLoading}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[#22c55e] hover:bg-[#22c55e11] rounded-lg transition-all"
+                  disabled={isAiLoading || !chatInput.trim()}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[#22c55e] hover:bg-[#22c55e11] rounded-lg transition-all disabled:opacity-50"
                 >
                   <Cpu className={`w-4 h-4 ${isAiLoading ? "animate-spin" : ""}`} />
                 </button>

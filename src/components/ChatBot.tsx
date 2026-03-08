@@ -27,12 +27,25 @@ export function ChatBot({ onError }: ChatBotProps) {
   const [isThinkingMode, setIsThinkingMode] = useState(false);
   
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  // Keyboard shortcut: Ctrl+Enter to send
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && inputRef.current === document.activeElement) {
+        e.preventDefault();
+        handleSend();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [input, isLoading]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;

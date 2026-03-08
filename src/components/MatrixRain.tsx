@@ -1,11 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const MatrixRain = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+
+  useEffect(() => {
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setIsReducedMotion(prefersReducedMotion);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || isReducedMotion) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -15,6 +22,7 @@ export const MatrixRain = () => {
     const cols = Math.floor(canvas.width / 20);
     const drops = Array(cols).fill(1);
     const chars = "01アイウエオカキクケコ∑∆∏∫ΩλΨ".split("");
+    let animationId: number;
 
     const draw = () => {
       ctx.fillStyle = "rgba(0,0,0,0.05)";
@@ -30,33 +38,30 @@ export const MatrixRain = () => {
         if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
       });
+
+      animationId = requestAnimationFrame(draw);
     };
 
-    const interval = setInterval(draw, 50);
+    animationId = requestAnimationFrame(draw);
     
     const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if (!canvasRef.current) return;
+      canvasRef.current.width = window.innerWidth;
+      canvasRef.current.height = window.innerHeight;
     };
+    
     window.addEventListener('resize', handleResize);
 
     return () => {
-      clearInterval(interval);
+      cancelAnimationFrame(animationId);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isReducedMotion]);
 
   return (
     <canvas 
       ref={canvasRef} 
-      style={{ 
-        position: "fixed", 
-        top: 0, 
-        left: 0, 
-        zIndex: 0, 
-        opacity: 0.18, 
-        pointerEvents: "none" 
-      }} 
+      className="fixed top-0 left-0 w-full h-full -z-10 bg-[#050508]"
     />
   );
 };

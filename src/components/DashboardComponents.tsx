@@ -10,7 +10,8 @@ export const SENSORS = [
 ];
 
 export const GlowCard = ({ sensor, value, history }: any) => {
-  const isAlert = value > sensor.alert;
+  const isAlert = sensor.id === "DIST_01" ? value < sensor.alert : value > sensor.alert;
+  
   return (
     <div style={{
       background: `linear-gradient(135deg, #0a0a0f 60%, ${sensor.glow})`,
@@ -20,30 +21,38 @@ export const GlowCard = ({ sensor, value, history }: any) => {
       position: "relative",
       overflow: "hidden",
       boxShadow: `0 0 24px ${isAlert ? "#ff444433" : sensor.glow}, inset 0 0 40px #00000080`,
-      transition: "box-shadow 0.3s",
+      transition: "all 0.3s ease-out",
       cursor: "default",
+      animation: isAlert ? "cardAlertPulse 1s ease-in-out" : "none",
     }}>
+      <style>{`
+        @keyframes cardAlertPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+        }
+      `}</style>
+      
       <div style={{ position: "absolute", top: 0, right: 0, width: 60, height: 60,
         background: `linear-gradient(135deg, transparent 50%, ${sensor.color}22 100%)`,
         borderBottomLeftRadius: 40 }} />
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
         <div>
-          <div style={{ color: "#666", fontSize: 10, letterSpacing: 3, fontFamily: "'Courier New', monospace", marginBottom: 4 }}>
+          <div style={{ color: "#666", fontSize: "clamp(8px, 1.5vw, 10px)", letterSpacing: 3, fontFamily: "'Courier New', monospace", marginBottom: 4 }}>
             {sensor.id}
           </div>
-          <div style={{ color: "#aaa", fontSize: 11, letterSpacing: 2, fontFamily: "'Courier New', monospace" }}>
+          <div style={{ color: "#aaa", fontSize: "clamp(9px, 1.6vw, 11px)", letterSpacing: 2, fontFamily: "'Courier New', monospace" }}>
             {sensor.label}
           </div>
         </div>
-        <span style={{ fontSize: 22 }}>{sensor.icon}</span>
+        <span style={{ fontSize: "clamp(18px, 5vw, 22px)" }}>{sensor.icon}</span>
       </div>
 
       <div style={{ fontFamily: "'Courier New', monospace", fontWeight: 700,
-        fontSize: 32, color: isAlert ? "#ff4444" : sensor.color,
+        fontSize: "clamp(24px, 6vw, 32px)", color: isAlert ? "#ff4444" : sensor.color,
         textShadow: `0 0 20px ${isAlert ? "#ff4444" : sensor.color}`,
-        letterSpacing: -1, marginBottom: 4 }}>
-        {value}<span style={{ fontSize: 14, fontWeight: 400, color: "#666", marginLeft: 4 }}>{sensor.unit}</span>
+        letterSpacing: -1, marginBottom: 4, transition: "all 0.3s ease" }}>
+        {value.toFixed(1)}<span style={{ fontSize: "clamp(10px, 2vw, 14px)", fontWeight: 400, color: "#666", marginLeft: 4 }}>{sensor.unit}</span>
       </div>
 
       {isAlert && (
