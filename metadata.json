@@ -1,0 +1,5 @@
+{
+  "name": "GabIoT Connect",
+  "description": "A secure IoT dashboard for monitoring sensor data with AI-driven analysis and hardware integration support.",
+  "requestFramePermissions": []
+}

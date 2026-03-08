@@ -1,0 +1,33 @@
+# GabIoT Connect Cursor Rules
+
+## Project Context
+GabIoT Connect is a secure IoT dashboard for monitoring sensor data with AI-driven analysis.
+It uses React, Tailwind CSS, Supabase for backend, and Gemini for AI.
+
+## Tech Stack
+- **Frontend**: React 19, Vite, Tailwind CSS 4, Lucide React, Recharts, Motion.
+- **Backend**: Supabase (Auth, Database).
+- **AI**: Google Gemini API (@google/genai).
+
+## Coding Standards
+- Use TypeScript for all files.
+- Use functional components and hooks.
+- Use Tailwind CSS for all styling.
+- Follow the established "cyber-dashboard" aesthetic (dark theme, green/cyan accents, monospace fonts).
+- Implement robust error handling for all API calls and data fetching.
+- Use the `showToast` system for user feedback.
+
+## Supabase Integration
+- Use the Supabase client from `src/services/supabase.ts`.
+- Prefer Supabase Auth for user management.
+- Store sensor telemetry in Supabase Database.
+
+## AI Integration
+- Use the Gemini service from `src/services/gemini.ts`.
+- Always provide live sensor context to the AI when relevant.
+
+## File Structure
+- `src/components/`: Reusable UI components.
+- `src/services/`: External service integrations (Gemini, Supabase).
+- `src/App.tsx`: Main application logic and layout.
+- `src/index.css`: Global styles and Tailwind configuration.
